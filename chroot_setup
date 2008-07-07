@@ -1,0 +1,98 @@
+#!/bin/bash
+
+DISTRO=$1
+DST=$2
+
+USER=alfmatos
+GROUPS=alfmatos
+
+SOURCE="http://de.archive.ubuntu.com/ubuntu"
+
+if [ $UID != 0 ]; then
+	echo "Superuser permissions required. Aborting."
+	exit 1
+fi;
+
+if [ ! -x /usr/sbin/debootstrap ]; then
+	echo "deboostrap required but no installed."
+	echo "Try 'apt-get install debootstrap'"
+	exit 1
+fi;
+
+
+function usage {
+	echo "$0 [distribution] [destination]"
+	echo "Ex.: $0 dapper /tmp/dapper-test"
+}
+
+function check_dir {
+	DIR=$1
+	echo "Checking $DIR"
+	if [ ! -d $DIR ]; then
+		echo "$DIR does not exist. Creating it."
+		mkdir -p $DIR
+		if [ $? != 0 ]; then
+			echo "error creating $DIR. Aborting"
+			exit 1
+		fi;
+	fi;
+}
+
+if [ "$1" == "" ]; then
+	echo "No Distribution given. Using Ubuntu Hardy."
+	DISTRO=hardy
+fi;
+
+if [ "$2" == "" ]; then
+	DST=/var/chroot
+	echo "No destination dir given. Using $DST" 
+fi;
+
+echo "Installing $DISTRO chroot to $DST/$DISTRO"
+
+CHRDST=$DST/$DISTRO
+
+check_dir $CHRDST
+
+PACKAGES=$CHRDST/var/cache/apt/archives
+CACHE=$DST/packages/$DISTRO
+
+if [ -d $CACHE ]; then
+	check_dir $PACKAGES
+	cp $CACHE/*.deb $PACKAGES
+fi;
+
+debootstrap $DISTRO $CHRDST $SOURCE 
+
+echo "Updating deb package cache"
+check_dir $CACHE
+rsync --progress $PACKAGES/*.deb $CACHE
+
+echo "Copying extra system files into chroot."
+
+HOMEDIR=$CHRDST/home/alfmatos
+ETCDIR=$CHRDST/etc
+
+check_dir $HOMEDIR
+check_dir $ETCDIR
+
+echo "$DISTRO-chroot" > $ETCDIR/debian_chroot
+
+FILES="passwd shadow group sudoers hosts"
+
+for i in $FILES; do
+	cp /etc/$i $ETCDIR
+done;
+
+chown $USER:$GROUP $HOMEDIR
+
+if [ -f /home/$USER/.bash_rc ]; then
+	cp /home/$USER/.bashrc $HOMEDIR
+fi;
+
+# Enable extra sources in the apt sources.list
+
+if [ "$DISTRO" == "hardy" ]; then
+   echo "Enabling universe and multiverse for ubuntu."
+   echo "deb $SOURCE $DISTRO universe multiverse" >> $ETCDIR/apt/sources.list
+fi;

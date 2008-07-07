@@ -1,0 +1,20 @@
+#!/bin/bash
+
+DISTRO=/var/chroot/hardy
+
+BIND_DIRS="dev tmp"
+
+if [ $UID != 0 ]; then
+	echo "Superuser permissions required. Aborting."
+	exit 1
+fi;
+
+if [ "$1" != "" ]; then
+	DISTRO=$1;
+fi;
+
+mount -t proc none $DISTRO/proc
+
+for i in $BIND_DIRS; do
+	mount -o bind /$i $DISTRO/$i
+done;

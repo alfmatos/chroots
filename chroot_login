@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DISTRO=/var/chroot/hardy
+
+if [ $UID != 0 ]; then
+	echo "Superuser permissions required. Aborting."
+	exit 1
+fi;
+
+chroot $DISTRO /bin/bash 

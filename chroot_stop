@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DISTRO=/var/chroot/hardy
+
+sudo umount $DISTRO/proc
+sudo umount $DISTRO/dev
+sudo umount $DISTRO/tmp
