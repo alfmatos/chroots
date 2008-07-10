@@ -3,26 +3,22 @@
 DISTRO=$1
 DST=$2
 
-USER=alfmatos
-GROUPS=alfmatos
-
 SOURCE="http://de.archive.ubuntu.com/ubuntu"
 
-if [ $UID != 0 ]; then
-	echo "Superuser permissions required. Aborting."
-	exit 1
-fi;
+# Binary files
 
-if [ ! -x /usr/sbin/debootstrap ]; then
-	echo "deboostrap required but no installed."
-	echo "Try 'apt-get install debootstrap'"
-	exit 1
-fi;
-
+DEBOOTSTRAP=/usr/sbin/debootstrap
 
 function usage {
-	echo "$0 [distribution] [destination]"
-	echo "Ex.: $0 dapper /tmp/dapper-test"
+	cat << EOF
+ $0 [distribution destination]"
+ Usage example: $0 hardy /vat/chroot/test-hardy"
+
+OPTIONS:
+  -h, --help    Show this message
+  -v, --verbose Verbose [Not implemented]
+
+EOF
 }
 
 function check_dir {
@@ -38,17 +34,58 @@ function check_dir {
 	fi;
 }
 
+
+# Begin program
+
+case "$1" in
+	--help|-h)
+		usage
+		exit 0
+		;;
+esac
+
+if [ $UID != 0 ]; then
+	echo "Superuser permissions required. Aborting."
+	exit 1
+fi;
+
+if [ ! -x $DEBOOTSTRAP ]; then
+	echo "deboostrap required but no installed."
+	echo "Try 'apt-get install debootstrap'"
+	exit 1
+fi;
+
 if [ "$1" == "" ]; then
-	echo "No Distribution given. Using Ubuntu Hardy."
-	DISTRO=hardy
+	if [ -r /etc/lsb-release ]; then
+		. /etc/lsb-release
+		DISTRO=$DISTRIB_CODENAME
+		echo "Using current distribution: \"$DISTRIB_ID $DISTRO\"" 
+	else
+		echo "Using default distribution: \"Ubuntu hardy\""
+		DISTRO=hardy
+	fi;
 fi;
 
 if [ "$2" == "" ]; then
 	DST=/var/chroot
-	echo "No destination dir given. Using $DST" 
+	echo "Using default chroot target: \"$DST/$DISTRO\"" 
 fi;
 
-echo "Installing $DISTRO chroot to $DST/$DISTRO"
+case $DISTRO in
+	"intrepid"|"hardy"|"gutsy"|"feisty"|"dapper")
+		echo "Using a ubuntu distribution"
+		;;
+	"lenny"|"sarge"|"sid"|"unstable")
+		echo "Using a debian distribution"
+		;;
+	*)
+		echo "Unknown distribution: \"$DISTRO\". Aborting."
+		;;
+esac;
+
+echo "Creating $DISTRO chroot in $DST/$DISTRO."
+
+exit 0
 
 CHRDST=$DST/$DISTRO
 
@@ -84,11 +121,10 @@ for i in $FILES; do
 	cp /etc/$i $ETCDIR
 done;
 
-chown $USER:$GROUP $HOMEDIR
-
-if [ -f /home/$USER/.bash_rc ]; then
-	cp /home/$USER/.bashrc $HOMEDIR
-fi;
+#chown $USER:$GROUP $HOMEDIR
+#if [ -f /home/$USER/.bash_rc ]; then
+#	cp /home/$USER/.bashrc $HOMEDIR
+#fi;
 
 # Enable extra sources in the apt sources.list
 
