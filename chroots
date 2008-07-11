@@ -19,14 +19,15 @@ EOF
 
 case "$1" in 
     "setup"|"init"|"login"|"stop"|"list")
+	PATH=$PATH:.
         CHROOTS_PATH=`which chroots-$1`
         if [ -z $CHROOTS_PATH ]; then
             echo "Couldn't find chroots-$1 in PATH"
             exit 1
         else
-            $CHROOTS_PATH
-            exit 0
-        fi
+		$CHROOTS_PATH
+		exit 0
+	fi
         ;;
     *)
         usage
