@@ -1,0 +1,35 @@
+#!/bin/bash
+
+function usage {
+cat << EOF
+usage: $0 COMMAND
+
+The most commonly used chroots commands are:
+    setup   Bootstrap a basic debian system
+    init    Mount/Bind the necessary paths to be used in the chroot
+    login   Login to chroot
+    stop    Unmount/Unbind the previously mounted chroot paths
+
+OPTIONS:
+    -h, --help    Show this message
+    -v, --verbose Verbose [Not implemented]
+EOF
+    exit 0;
+}
+
+case "$1" in 
+    "setup"|"init"|"login"|"stop"|"list")
+        CHROOTS_PATH=`which chroots-$1`
+        if [ -z $CHROOTS_PATH ]; then
+            echo "Couldn't find chroots-$1 in PATH"
+            exit 1
+        else
+            $CHROOTS_PATH
+            exit 0
+        fi
+        ;;
+    *)
+        usage
+        ;;
+esac
+
