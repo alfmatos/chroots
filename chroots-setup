@@ -85,9 +85,12 @@ esac;
 
 echo "Creating $DISTRO chroot in $DST/$DISTRO."
 
-exit 0
-
 CHRDST=$DST/$DISTRO
+
+if [ -d $CHRDST ]; then
+	echo "Target already exists. Aborting."
+	exit 1
+fi
 
 check_dir $CHRDST
 
