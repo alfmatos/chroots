@@ -1,10 +1,29 @@
 #!/bin/bash
 
-DISTRO=/var/chroot/hardy
+TARGET=/var/chroot/hardy
+USER=root
+
+function usage
+{
+	echo "chroots-login [TARGET] [USER]" 
+	echo ""
+	echo "TARGET .. target chroot for login"
+	echo "USER .. user to use in the login"
+}
+
+if [ "$1" != "" ]; then
+	TARGET=$1
+fi;
+
+if [ "$2" != "" ]; then
+	USER=$2
+fi;
 
 if [ $UID != 0 ]; then
 	echo "Superuser permissions required. Aborting."
 	exit 1
 fi;
 
-chroot $DISTRO /bin/bash 
+echo "Loging in to $USER@$TARGET"
+
+chroot $TARGET /bin/su - $USER
