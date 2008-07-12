@@ -12,7 +12,7 @@ DEBOOTSTRAP=/usr/sbin/debootstrap
 function usage {
 	cat << EOF
  $0 [distribution destination]"
- Usage example: $0 hardy /vat/chroot/test-hardy"
+ Usage example: $0 hardy /var/chroot/test-hardy"
 
 OPTIONS:
   -h, --help    Show this message
