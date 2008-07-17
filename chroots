@@ -9,6 +9,7 @@ usage: $NAME COMMAND
 
 The most commonly used chroots commands are:
     setup   Bootstrap a basic debian system
+    list    List existing chroots installed with chroots
     init    Mount/Bind the necessary paths to be used in the chroot
     login   Login to chroot
     stop    Unmount/Unbind the previously mounted chroot paths
