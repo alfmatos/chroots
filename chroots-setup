@@ -37,12 +37,39 @@ function check_dir {
 
 # Begin program
 
-case "$1" in
-	--help|-h)
-		usage
-		exit 0
-		;;
-esac
+OPTS="v"
+LONGOPTS="verbose"
+
+TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
+
+eval set -- "$TEMP"
+
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+while true; do
+	case "$1" in
+		--help|-h)
+			echo "Help";
+			shift;
+			;;
+		-v|--verbose)
+			echo "Verbose mode on";
+			shift;
+			;;
+		--)
+			shift;
+			break;
+			;;
+		*)
+			echo "Error parsing options";
+			exit 1;
+			;;
+	esac
+done;
+
+for arg in $@; do echo "--""$arg"; done
+
+exit
 
 if [ $UID != 0 ]; then
 	echo "Superuser permissions required. Aborting."
