@@ -3,12 +3,19 @@
 TARGET=/var/chroot/hardy
 USER=root
 
-function usage
-{
-	echo "chroots-login [TARGET] [USER]" 
-	echo ""
-	echo "TARGET .. target chroot for login"
-	echo "USER .. user to use in the login"
+function usage {
+
+NAME=`echo $1 | sed -e "s/\.\///g"`
+
+	cat << EOF
+ $NAME [target user]"
+ Usage example: $NAME hardy /var/chroot/test-hardy"
+
+OPTIONS:
+  -h, --help    Show this message
+  -v, --verbose Verbose [Not implemented]
+
+EOF
 }
 
 if [ "$1" != "" ]; then

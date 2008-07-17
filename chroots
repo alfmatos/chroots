@@ -1,8 +1,11 @@
 #!/bin/bash
 
 function usage {
+
+NAME=`echo $1 | sed -e "s/\.\///g"`
+
 cat << EOF
-usage: $0 COMMAND
+usage: $NAME COMMAND
 
 The most commonly used chroots commands are:
     setup   Bootstrap a basic debian system
@@ -30,7 +33,7 @@ case "$1" in
 	fi
         ;;
     *)
-        usage
+        usage $0
         ;;
 esac
 

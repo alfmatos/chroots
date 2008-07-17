@@ -10,9 +10,11 @@ SOURCE="http://de.archive.ubuntu.com/ubuntu"
 DEBOOTSTRAP=/usr/sbin/debootstrap
 
 function usage {
+NAME=`echo $1 | sed -e "s/\.\///g"`
+
 	cat << EOF
- $0 [distribution destination]"
- Usage example: $0 hardy /var/chroot/test-hardy"
+ $NAME [distribution destination]"
+ Usage example: $NAME hardy /var/chroot/test-hardy"
 
 OPTIONS:
   -h, --help    Show this message
@@ -39,7 +41,7 @@ function check_dir {
 
 case "$1" in
 	--help|-h)
-		usage
+		usage $0
 		exit 0
 		;;
 esac
