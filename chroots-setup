@@ -1,12 +1,6 @@
 #!/bin/bash
 
-DISTRO=$1
-DST=$2
-
 SOURCE="http://de.archive.ubuntu.com/ubuntu"
-
-# Binary files
-
 DEBOOTSTRAP=/usr/sbin/debootstrap
 
 function usage {
@@ -37,8 +31,10 @@ function check_dir {
 
 # Begin program
 
-OPTS="v"
-LONGOPTS="verbose"
+VERBOSE=0
+
+OPTS="vh"
+LONGOPTS="verbose,help"
 
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
@@ -49,11 +45,11 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 while true; do
 	case "$1" in
 		--help|-h)
-			echo "Help";
+			usage $0;
 			shift;
 			;;
-		-v|--verbose)
-			echo "Verbose mode on";
+		--verbose|-v)
+			VERBOSE=1
 			shift;
 			;;
 		--)
@@ -67,9 +63,8 @@ while true; do
 	esac
 done;
 
-for arg in $@; do echo "--""$arg"; done
-
-exit
+DISTRO=$1
+DST=$2
 
 if [ $UID != 0 ]; then
 	echo "Superuser permissions required. Aborting."
@@ -110,9 +105,9 @@ case $DISTRO in
 		;;
 esac;
 
-echo "Creating $DISTRO chroot in $DST/$DISTRO."
-
 CHRDST=$DST/$DISTRO
+
+echo "Creating $DISTRO chroot in $CHRDST."
 
 if [ -d $CHRDST ]; then
 	echo "Target already exists. Aborting."
