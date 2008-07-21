@@ -1,0 +1,5 @@
+Basic workflow:
+
+  chroots setup; # Create a chroot
+  chroots init; # Mount the necessary dirs for proper chroot init
+  chroots login; # Login into the chroot
