@@ -16,7 +16,7 @@ The most commonly used chroots commands are:
 
 OPTIONS:
     -h, --help    Show this message
-    -v, --verbose Verbose [Not implemented]
+    -v, --verbose Verbose output
 EOF
     exit 0;
 }
