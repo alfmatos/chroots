@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SOURCE="http://de.archive.ubuntu.com/ubuntu"
+MIRROR="http://archive.ubuntu.com/ubuntu"
 DEBOOTSTRAP=/usr/sbin/debootstrap
 
 function usage {
@@ -12,7 +12,7 @@ NAME=`echo $1 | sed -e "s/\.\///g"`
 
 OPTIONS:
   -h, --help    Show this message
-  -v, --verbose Verbose [Not implemented]
+  -v, --verbose Verbose
 
 EOF
 }
@@ -126,7 +126,7 @@ if [ -d $CACHE ]; then
 	cp $CACHE/*.deb $PACKAGES
 fi;
 
-debootstrap $DISTRO $CHRDST $SOURCE 
+debootstrap $DISTRO $CHRDST $MIRROR 
 
 echo "Updating deb package cache"
 check_dir $CACHE
@@ -157,5 +157,5 @@ done;
 
 if [ "$DISTRO" == "hardy" ]; then
    echo "Enabling universe and multiverse for ubuntu."
-   echo "deb $SOURCE $DISTRO universe multiverse" >> $ETCDIR/apt/sources.list
+   echo "deb $MIRROR $DISTRO universe multiverse" >> $ETCDIR/apt/sources.list
 fi;
