@@ -1,0 +1,32 @@
+#!/bin/bash
+
+CONF="$HOME/.chroots"
+
+function usage {
+NAME=`echo $1 | sed -e "s/\.\///g"`
+
+	cat << EOF
+ $NAME list"
+ Usage example: $NAME list"
+
+OPTIONS:
+  -h, --help    Show this message
+EOF
+}
+
+# Begin program
+
+case "$1" in
+	--help|-h)
+		usage $0
+		exit 0
+		;;
+esac
+
+if [ ! -r $CONF ]; then
+	exit 0
+fi;
+
+echo "total `wc -l $CONF`"
+
+exit 0
