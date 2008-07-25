@@ -38,8 +38,16 @@ function check_dir {
 
 VERBOSE=0
 USECACHE="yes"
-USER=root
-GROUP=root
+
+# determine user and GROUP
+
+CHRUSER=$USER
+CHRGROUP=$GROUPS
+
+if [ $SUDO_USER ]; then
+	CHRUSER=$SUDO_USER
+	CHRGROUP=$SUDO_GID
+fi;
 
 OPTS="vhu:g:c"
 LONGOPTS="verbose,help,user:,group:,no-cache"
@@ -65,7 +73,7 @@ while true; do
 			shift;
 			;;
 		--user|-u)
-			USER=$2;
+			CHRUSER=$2;
 			shift; shift;
 			;;
 		--group|-g)
@@ -154,11 +162,8 @@ rsync --progress $PACKAGES/*.deb $CACHE
 
 echo "Copying extra system files into chroot."
 
-HOMEDIR=$CHRDST/root
+HOMEDIR=$CHRDST/$HOME
 
-if [ "$USER" != "root" ]; then
-	HOMEDIR=$CHRDST/home/$USER
-fi;
 
 ETCDIR=$CHRDST/etc
 
@@ -173,19 +178,12 @@ for i in $FILES; do
 	cp /etc/$i $ETCDIR
 done;
 
-# default to the username as group instead of the root groop
-if [ "$USER" != "root" ]; then
-	# Set a default group for the HOMEDIR
-	if [ $GROUP = "" ]; then
-		GROUP=$USER;
-	fi;
-
-	# Set some defaults for nice login
-	chown $USER:$GROUP $HOMEDIR
-	if [ -f /home/$USER/.bash_rc ]; then
-		cp /home/$USER/.bashrc $HOMEDIR
-	fi;
+# Set some defaults for nice login
+if [ -f $HOME/.bashrc ]; then
+	cp $HOME/.bashrc $HOMEDIR
 fi;
+
+chown -R $CHRUSER:$CHRGROUP $HOMEDIR
 
 
 # Enable extra sources in the apt sources.list
@@ -195,11 +193,7 @@ if [ "$DISTRO" == "hardy" ]; then
 fi;
 
 # Post install
-
-CHRTAG="$DISTRO $CHRDST"
-
-if [ $USER != "root" ]; then
-	CHRTAG="$CHROOTAG $USER"
-fi;
+CHRTAG="$DISTRO $CHRDST $CHRUSER"
 
 echo $CHRTAG >> $HOME/.chroots
+chown $CHRUSER:$CHRGROUP $HOME/.chroots
