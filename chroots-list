@@ -6,8 +6,8 @@ function usage {
 NAME=`echo $1 | sed -e "s/\.\///g"`
 
 	cat << EOF
- $NAME list"
- Usage example: $NAME list"
+ $NAME list
+ Usage example: $NAME list
 
 OPTIONS:
   -h, --help    Show this message
@@ -27,6 +27,18 @@ if [ ! -r $CONF ]; then
 	exit 0
 fi;
 
-echo "total `wc -l $CONF`"
+NL=`cat $CONF | grep -v "^#" | wc -l`
+
+echo "total $NL"
+
+let i=0
+while read line; do
+	T=`echo $line | grep -v "^#"`
+	if [ "$T" == "" ]; then
+		continue;
+	fi;
+	let i=$i+1
+	echo "$i: $line"
+done < "$CONF"
 
 exit 0
