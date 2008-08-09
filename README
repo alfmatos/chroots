@@ -1,4 +1,16 @@
-Basic workflow:
+chroots - Simple chroot creating and maintenance
+================================================
+
+Chroots allow the creation of chroots by issue a setup command. It also allows
+logging in to the chroots along with the necessary management of mount points. 
+
+Installation
+============
+
+TBD
+
+Basic work flow
+===============
 
   chroots setup; # Create a chroot
   chroots init; # Mount the necessary dirs for proper chroot init
