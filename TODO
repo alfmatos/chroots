@@ -1,5 +1,2 @@
-- Fix generation of the .chroots file
-  Drop privileges if file is in $HOME/.chroots
-
 - Remove getopt handling from chroots basic command
 - Add passing options from the chroots to chroot-COMMAND exec
