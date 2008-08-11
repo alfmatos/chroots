@@ -23,7 +23,7 @@ EOF
 exit 0
 }
 
-OPTS="+vh"
+OPTS="vh"
 LONGOPTS="verbose,help"
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
