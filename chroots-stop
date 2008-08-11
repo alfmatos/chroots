@@ -2,6 +2,8 @@
 
 . chroots-functions
 
+FORCE=0
+
 function usage {
 
 NAME=`echo $1 | sed -e "s/\.\///g"`
@@ -15,13 +17,14 @@ NAME=`echo $1 | sed -e "s/\.\///g"`
 OPTIONS:
   -h, --help      Show this message
   -v, --verbose   Verbose
+  -f, --force     Force umounting the shared paths
 
 EOF
 exit 0
 }
 
-OPTS="vh"
-LONGOPTS="verbose,help"
+OPTS="vhf"
+LONGOPTS="verbose,help,force"
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
 eval set -- "$TEMP"
@@ -37,6 +40,10 @@ while true; do
 			;;
 		--verbose|-v)
 			VERBOSE=1
+			shift;
+			;;
+		--force|-f)
+			FORCE=1;
 			shift;
 			;;
 		--)
@@ -63,11 +70,16 @@ fi;
 
 # Validate chroot
 
-chroots_check_mount $CHRNAME
+if [ $FORCE == 0 ];  then
+	chroots_check_mount $CHRNAME
 
-if [ $? != 0 ]; then
-	echo "Chroot $CHRNAME is not mounted.";
-	exit 1;
+	if [ $? != 1 ]; then
+		echo "Chroot $CHRNAME is not mounted.";
+		exit 1;
+	fi;
+
+else
+	echo "Forcing unmount chroot $CHRNAME";
 fi;
 
 # Try to unmount
