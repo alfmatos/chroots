@@ -1,0 +1,59 @@
+#!/bin/bash
+
+PROGVERSION="0.01"
+PROGNAME="chroots"
+CHROOTS=$HOME/.chroots
+
+VERBOSE=1
+
+function chroots_check_permissions {
+	if [ $UID != 0 ]; then
+		echo "Superuser permissions required. Aborting."
+		exit 1
+	fi;
+}
+
+function chroots_version {
+	echo "$PROGNAME $PROGVERSION - Copyright (C) Alfredo Matos 2008"
+}
+
+function get_default_chroot {
+	if [ -r /etc/lsb-release ]; then
+		. /etc/lsb-release
+		DEFAULT_CHRNAME=$DISTRIB_CODENAME
+	else
+		DEFAULT_CHRNAME=hardy
+	fi;
+}
+
+function chroots_get_chroot {
+	if [ ! -f $CHROOTS ]; then
+		echo "File $CHROOTS does not exist. No chroot installed.";
+		return 1;
+	fi;
+
+	CFG=`grep "^$1 " $CHROOTS` 
+
+	if [ "$CFG" == "" ]; then
+		return 1;
+	fi;
+
+	_CHRTARGET=`echo $CFG | cut -d " " -f 2`
+	_CHRUSER=`echo $CFG | cut -d " " -f 3`
+	_CHRNAME=$1
+}
+
+function chroots_check_mount {
+	chroots_get_chroot $1;
+
+	if [ $? != 0 ]; then
+		return 2;
+	fi;
+
+	echo "Chekcing if $_CHRNAME is mounted..."
+
+	return 0;
+}
+
+
+
