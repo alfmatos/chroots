@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CHRTARGET=/var/chroot/hardy
+CHRNAME=hardy
 CHRUSER=root
 VERBOSE=0
 
@@ -9,10 +9,10 @@ function usage {
 NAME=`echo $1 | sed -e "s/\.\///g"`
 
 	cat << EOF
- $NAME [target] [OPTIONS]"
- Usage example: $NAME hardy /var/chroot/test-hardy"
+ $NAME [chroot_name] [OPTIONS]"
+ Usage example: $NAME hardy "
 
-  Login to the specified chroot.  A username can be specified.
+  Login to the specified chroot, which can be listed with "chroots list".
 
 OPTIONS:
   -h, --help      Show this message
@@ -70,12 +70,20 @@ if [ "$1" != "" ]; then
 	CHRTARGET=$1
 fi;
 
+# Validate chroot
+
+# Determine the default username from the config file
+
+CHRUSER=root
 
 # Check if correctly mounted
 
 
 # Login
 
-echo "Loging in to $CHRUSER@$CHRTARGET"
+if [ $VERBOSE == 1 ]; then
+	echo "Loging in to $CHRUSER@$CHRNAME"
+fi;
+
 
 chroot $CHRTARGET /bin/su - $CHRUSER
