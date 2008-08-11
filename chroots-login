@@ -1,8 +1,8 @@
 #!/bin/bash
 
-CHRNAME=hardy
-CHRUSER=root
-VERBOSE=0
+. chroots-functions
+
+CHRUSER=""
 
 function usage {
 
@@ -16,15 +16,15 @@ NAME=`echo $1 | sed -e "s/\.\///g"`
 
 OPTIONS:
   -h, --help      Show this message
-  -v, --verbose   Verbose [Not implemented]
+  -v, --verbose   Verbose output
   -u, --username  Use a specific username to login
 
 EOF
 exit 0
 }
 
-OPTS="vh"
-LONGOPTS="verbose,help"
+OPTS="vhu:"
+LONGOPTS="verbose,help,username:"
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
 eval set -- "$TEMP"
@@ -42,10 +42,10 @@ while true; do
 			VERBOSE=1
 			shift;
 			;;
-		--username|-u);
-			CHRUSER=$2
-			shift;shift;
-			break;
+		--username|-u)
+			CHRUSER=$2;
+			shift; shift;
+			;;
 		--)
 			shift;
 			break;
@@ -57,27 +57,31 @@ while true; do
 	esac
 done;
 
-
-if [ $UID != 0 ]; then
-	echo "Superuser permissions required. Aborting."
-	exit 1
-fi;
-
+chroots_check_permissions;
 
 # Determine chroot to use
 
-if [ "$1" != "" ]; then
-	CHRTARGET=$1
+if [ "$1" == "" ]; then
+	get_default_chroot;
+	echo "Using default chroot $DEFAULT_CHRNAME";
+	CHRNAME=$DEFAULT_CHRNAME;
+else
+	CHRNAME=$1;
 fi;
 
 # Validate chroot
 
-# Determine the default username from the config file
+chroots_check_mount $CHRNAME 
 
-CHRUSER=root
+if [ $? != 0 ]; then
+	echo "chroot $CHRNAME is not mounted or does not exist."
+	exit 1;
+fi;
 
-# Check if correctly mounted
-
+if [ "$CHRUSER" == "" ]; then
+	echo "Using default user $_CHRUSER"
+	CHRUSER=$_CHRUSER
+fi;
 
 # Login
 
@@ -85,5 +89,4 @@ if [ $VERBOSE == 1 ]; then
 	echo "Loging in to $CHRUSER@$CHRNAME"
 fi;
 
-
-chroot $CHRTARGET /bin/su - $CHRUSER
+chroot $_CHRTARGET /bin/su - $CHRUSER
