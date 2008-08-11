@@ -21,9 +21,9 @@ EOF
     exit 0;
 }
 
-VERBOSE=""
+VERBOSE=0
 
-OPTS="vh"
+OPTS="+vh"
 LONGOPTS="verbose,help"
 
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
@@ -37,9 +37,10 @@ while true; do
 		--help|-h)
 			usage $0;
 			exit 0;
+			shift;
 			;;
-		-v|--verbose)
-			VERBOSE="--verbose"
+		--verbose|-v)
+			VERBOSE=1
 			shift;
 			;;
 		--)
@@ -55,13 +56,17 @@ done;
 
 case "$1" in 
     "setup"|"init"|"login"|"stop"|"list")
+	CMD=$1
+	shift;
+	echo "$# parameters: $@" 
+
 	PATH=$PATH:.
-        CHROOTS_PATH=`which chroots-$1`
+        CHROOTS_PATH=`which chroots-$CMD`
         if [ -z $CHROOTS_PATH ]; then
-            echo "Couldn't find chroots-$1 in PATH"
+            echo "Couldn't find chroots-$CMD in PATH"
             exit 1
         else
-		$CHROOTS_PATH $VERBOSE
+		echo "$CHROOTS_PATH $@"
 		exit 0
 	fi
         ;;
