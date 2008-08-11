@@ -1,9 +1,6 @@
 #!/bin/bash
 
-CHROOTS=$HOME/.chroots
-CHRTARGET=/var/chroot/hardy
-CHRNAME=hardy
-VERBOSE=0
+. chroots-functions
 
 function usage {
 
@@ -53,26 +50,40 @@ while true; do
 	esac
 done;
 
-if [ $UID != 0 ]; then
-	echo "Superuser permissions required. Aborting."
-	exit 1
-fi;
+chroots_check_permissions
 
 # Determine chroot to use
 
-if [ "$1" != "" ]; then
-	CHRNAME=$1
+if [ "$1" == "" ]; then
+	get_default_chroot;
+	CHRNAME=$DEFAULT_CHRNAME
+else
+	CHRNAME=$1;
 fi;
 
 # Validate chroot
 
-# Get CHRTARGET form CHRNAME
+chroots_check_mount $CHRNAME
+
+if [ $? != 0 ]; then
+	echo "Chroot $CHRNAME is not mounted.";
+	exit 1;
+fi;
 
 # Try to unmount
 
-for i in "proc dev tmp"; do
+if [ $VERBOSE == 1 ]; then
+	echo "Stoping chroot $CHRNAME running on $_CHRTARGET";
+fi;
+
+for i in proc dev tmp; do
 	if [ $VERBOSE == 1 ]; then
-		echo "Unmount $CHRTARGET/$I";
+		echo "Unmounting $_CHRTARGET/$i";
 	fi;
-	umount $CHRTARGET/$i
+
+	umount $_CHRTARGET/$i &>/dev/null
+
+	if [ $? != 0 ]; then
+		echo "Failed to umount $_CHRTARGET/$i";
+	fi;
 done;
