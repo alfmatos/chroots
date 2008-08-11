@@ -1,9 +1,8 @@
 #!/bin/bash
 
-DISTRO=/var/chroot/hardy
-BIND_DIRS="dev tmp"
-VERBOSE=0
+BINDDIRS="/dev /tmp"
 
+. chroots-functions
 
 function usage {
 
@@ -21,14 +20,7 @@ EOF
     exit 0;
 }
 
-if [ $UID != 0 ]; then
-	echo "Superuser permissions required. Aborting."
-	exit 1
-fi;
 
-if [ "$1" != "" ]; then
-	DISTRO=$1;
-fi;
 
 OPTS="vh"
 LONGOPTS="verbose,help"
@@ -60,22 +52,36 @@ while true; do
 	esac
 done;
 
+chroots_check_permissions;
+
 # Check input and select a chroot
+
+get_work_chroot $1
+
+CHRNAME=$_CHRNAME
 
 # Find the necessary mount points and verify
 
+chroots_check_mount $CHRNAME;
+
+if [ $? != 0 ]; then
+	echo "chroot $CHRNAME already mounted or does not exist" 
+	exit 1;
+fi;
 
 # Mount
 
-if [ $VERBOSE != 0 ]; then
-	echo "Mount proc dir $DISTRO/proc"
+CHRTARGET=$_CHRTARGET
+
+if [ $VERBOSE == 1 ]; then
+	echo "Mount proc dir $CHRTARGET/proc"
 fi;
 
-mount -t proc none $DISTRO/proc
+mount -t proc none $CHRTARGET/proc
 
-for i in $BIND_DIRS; do
-	if [ $VERBOSE != 0 ]; then
-		echo "Binding $i to $DISTRO/$i"
+for i in $BINDDIRS; do
+	if [ $VERBOSE == 1 ]; then
+		echo "Binding $i to $CHRTARGET/$i"
 	fi;
-	mount -o bind /$i $DISTRO/$i
+	mount -o bind $i $CHRTARGET/$i
 done;
