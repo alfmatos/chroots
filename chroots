@@ -58,7 +58,6 @@ case "$1" in
     "setup"|"init"|"login"|"stop"|"list")
 	CMD=$1
 	shift;
-	echo "$# parameters: $@" 
 
 	PATH=$PATH:.
         CHROOTS_PATH=`which chroots-$CMD`
@@ -66,7 +65,7 @@ case "$1" in
             echo "Couldn't find chroots-$CMD in PATH"
             exit 1
         else
-		echo "$CHROOTS_PATH $@"
+		$CHROOTS_PATH $@
 		exit 0
 	fi
         ;;
