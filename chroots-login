@@ -61,23 +61,23 @@ chroots_check_permissions;
 
 # Determine chroot to use
 
-if [ "$1" == "" ]; then
-	get_default_chroot;
-	echo "Using default chroot $DEFAULT_CHRNAME";
-	CHRNAME=$DEFAULT_CHRNAME;
-else
-	CHRNAME=$1;
+get_work_chroot $1;
+
+CHRNAME=$_CHRNAME;
+
+if [ $VERBOSE == 1 ]; then
+	echo "Using $CHRNAME as chroot name"
 fi;
 
 # Validate chroot
-
 chroots_check_mount $CHRNAME 
 
-if [ $? != 0 ]; then
+if [ $? != 1 ]; then
 	echo "chroot $CHRNAME is not mounted or does not exist."
 	exit 1;
 fi;
 
+# Select user to use
 if [ "$CHRUSER" == "" ]; then
 	echo "Using default user $_CHRUSER"
 	CHRUSER=$_CHRUSER
