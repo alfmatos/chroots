@@ -36,6 +36,16 @@ function get_default_chroot {
 	fi;
 }
 
+function chroots_get_target {
+	_CHRNAME=$1
+	_CHRTARGET=$2
+	if [ "$_CHRTARGET" == "" ]; then
+		_CHRTARGET=/var/chroots
+		_CHRPATH=$_CHRTARGET/$_CHRNAME
+		echo "Using default chroot target: \"$_CHRPATH\""
+	fi;
+}
+
 function chroots_get_chroot {
 	if [ ! -f $CHROOTS ]; then
 		echo "File $CHROOTS does not exist. No chroot installed.";
@@ -114,5 +124,15 @@ function chroots_check_mount {
 	return 0;
 }
 
-
-
+function chroots_check_dir {
+	DIR=$1
+	# echo "Checking $DIR"
+	if [ ! -d $DIR ]; then
+		# echo "$DIR does not exist. Creating it."
+		mkdir -p $DIR
+		if [ $? != 0 ]; then
+			echo "error creating $DIR. Aborting"
+			exit 1
+		fi;
+	fi;
+}
