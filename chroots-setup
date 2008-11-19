@@ -3,43 +3,44 @@
 MIRROR="http://archive.ubuntu.com/ubuntu"
 DEBOOTSTRAP=/usr/sbin/debootstrap
 
+. chroots-functions
+
 function usage {
 NAME=`echo $1 | sed -e "s/\.\///g"`
 
 	cat << EOF
- $NAME [distribution destination]
- Usage example: $NAME hardy /var/chroot/test-hardy
+ $NAME <suite> <target>
+ Usage example: $NAME hardy /var/chroots/hardy-chroot
 
 OPTIONS:
   -h, 	       --help    		Show this message
   -v,          --verbose 		Verbose
   -u USERNAME, --user USERNAME          Copy a user from the system 
   -g GROUP,    --group GROUPNAME        Copy a group from the system
-  -c,          --no-cache               Do not use the package cache
+               --no-cache               Do not use chached packages
+
+  Note #1: The deepest target directory will be used as the chroot name
+
+   $ $NAME hardy /var/chroots/hardy-chroot;
+
+   The previous command installs an Ubuntu Hardy chroot into folder
+  "/var/chroots/hardy-chroot" with name "hardy-chroot". This is the
+   name used by the other commands to list, mount, login and quit.
+
+  Note #2: If the target is not a directory name, it will be used as the
+   chroot name and installed in '/var/chroots/chroot-name'
+
+  Note #3: All package cache is kept in /var/chroots/packages/{distro}
 
 EOF
 }
-
-function check_dir {
-	DIR=$1
-	echo "Checking $DIR"
-	if [ ! -d $DIR ]; then
-		echo "$DIR does not exist. Creating it."
-		mkdir -p $DIR
-		if [ $? != 0 ]; then
-			echo "error creating $DIR. Aborting"
-			exit 1
-		fi;
-	fi;
-}
-
 
 # Begin program
 
 VERBOSE=0
 USECACHE="yes"
 
-# determine user and GROUP
+# Determine runtime user
 
 CHRUSER=$USER
 CHRGROUP=$GROUPS
@@ -48,6 +49,8 @@ if [ $SUDO_USER ]; then
 	CHRUSER=$SUDO_USER
 	CHRGROUP=$SUDO_GID
 fi;
+
+HOMEDIR=/home/$CHRUSER
 
 OPTS="vhu:g:c"
 LONGOPTS="verbose,help,user:,group:,no-cache"
@@ -91,9 +94,6 @@ while true; do
 	esac
 done;
 
-DISTRO=$1
-DST=$2
-
 if [ $UID != 0 ]; then
 	echo "Superuser permissions required. Aborting."
 	exit 1
@@ -105,95 +105,114 @@ if [ ! -x $DEBOOTSTRAP ]; then
 	exit 1
 fi;
 
+
+# VALIDADE BOTH REQUIRED PARAMETERS
+
 if [ "$1" == "" ]; then
-	if [ -r /etc/lsb-release ]; then
-		. /etc/lsb-release
-		DISTRO=$DISTRIB_CODENAME
-		echo "Using current distribution: \"$DISTRIB_ID $DISTRO\"" 
-	else
-		echo "Using default distribution: \"Ubuntu hardy\""
-		DISTRO=hardy
-	fi;
+	echo "Invalid parameters: Must specify distribution.";
+	usage $0
+	exit 1
 fi;
 
 if [ "$2" == "" ]; then
-	DST=/var/chroot
-	echo "Using default chroot target: \"$DST/$DISTRO\"" 
+	echo "Invalid parameters: Must specify target.";
+	usage $0
+	exit 1
 fi;
+
+
+DISTRO=$1
 
 case $DISTRO in
 	"intrepid"|"hardy"|"gutsy"|"feisty"|"dapper")
-		echo "Using a ubuntu distribution"
+		#echo "Using a ubuntu distribution"
 		;;
 	"lenny"|"sarge"|"sid"|"unstable")
-		echo "Using a debian distribution"
+		#echo "Using a debian distribution"
 		;;
 	*)
 		echo "Unknown distribution: \"$DISTRO\". Aborting."
+		exit 1
 		;;
 esac;
 
-CHRDST=$DST/$DISTRO
+CHRNAME=`basename $2`
+CHRTARGET=`dirname $2`
 
-echo "Creating $DISTRO chroot in $CHRDST."
+if [ "$CHRTARGET" == "." ]; then
+	chroots_get_target $CHRNAME
+	CHRTARGET=$_CHRTARGET
+fi;
 
-if [ -d $CHRDST ]; then
+CHRPATH=$CHRTARGET/$CHRNAME
+
+#echo "CHRNAME: $CHRNAME"
+#echo "CHRPATH: $CHRPATH"
+#echo "CHRTARGET: $CHRTARGET"
+
+if [ -d $CHRPATH ]; then
 	echo "Target already exists. Aborting."
 	exit 1
 fi
 
-check_dir $CHRDST
+echo "Installing '$CHRNAME' into $CHRTARGET, using a $DISTRO distribution."
 
-PACKAGES=$CHRDST/var/cache/apt/archives
-CACHE=$DST/packages/$DISTRO
+chroots_check_dir $CHRPATH
+
+# System cache is located at /var/archives/cache
+
+PACKAGES=$CHRPATH/var/cache/apt/archives
+CACHE=/var/chroots/packages/$DISTRO
 
 if [ $USECACHE == "yes" ]; then
 	if [ -d $CACHE ]; then
-		check_dir $PACKAGES
-		rsync --progress $CACHE/*.deb $PACKAGES
+		chroots_check_dir $PACKAGES
+		rsync $CACHE/*.deb $PACKAGES
 	fi;
 fi;
 
-debootstrap $DISTRO $CHRDST $MIRROR 
+
+echo "Building the chroot environment"
+debootstrap $DISTRO $CHRPATH $MIRROR >& /dev/null
+echo "Done."
 
 echo "Updating deb package cache"
-check_dir $CACHE
-rsync --progress $PACKAGES/*.deb $CACHE
+chroots_check_dir $CACHE
+rsync $PACKAGES/*.deb $CACHE
+echo "Done."
 
 echo "Copying extra system files into chroot."
 
-HOMEDIR=$CHRDST/$HOME
+CHRHOMEDIR=$CHRPATH/home/$CHRUSER
+CHRETCDIR=$CHRPATH/etc
 
+chroots_check_dir $CHRHOMEDIR
+chroots_check_dir $CHRETCDIR
 
-ETCDIR=$CHRDST/etc
-
-check_dir $HOMEDIR
-check_dir $ETCDIR
-
-echo "$DISTRO-chroot" > $ETCDIR/debian_chroot
+echo "$CHRNAME-chroot" > $CHRETCDIR/debian_chroot
 
 FILES="passwd shadow group sudoers hosts"
 
 for i in $FILES; do
-	cp /etc/$i $ETCDIR
+	cp /etc/$i $CHRETCDIR
 done;
 
 # Set some defaults for nice login
-if [ -f $HOME/.bashrc ]; then
-	cp $HOME/.bashrc $HOMEDIR
+if [ -f $HOMEDIR/.bashrc ]; then
+	cp $HOMEDIR/.bashrc $CHRHOMEDIR
 fi;
 
-chown -R $CHRUSER:$CHRGROUP $HOMEDIR
+chown -R $CHRUSER:$CHRGROUP $CHRHOMEDIR
 
 
 # Enable extra sources in the apt sources.list
 if [ "$DISTRO" == "hardy" ]; then
    echo "Enabling universe and multiverse for ubuntu."
-   echo "deb $MIRROR $DISTRO universe multiverse" >> $ETCDIR/apt/sources.list
+   echo "deb $MIRROR $DISTRO universe multiverse" >> $CHRETCDIR/apt/sources.list
 fi;
 
 # Post install
-CHRTAG="$DISTRO $CHRDST $CHRUSER"
+CHRTAG="$CHRNAME $CHRPATH $DISTRO $CHRUSER"
 
-echo $CHRTAG >> $HOME/.chroots
-chown $CHRUSER:$CHRGROUP $HOME/.chroots
+echo $CHRTAG >> $HOMEDIR/.chroots
+chown $CHRUSER:$CHRGROUP $HOMEDIR/.chroots
