@@ -1,2 +1,20 @@
-- Remove getopt handling from chroots basic command
-- Add passing options from the chroots to chroot-COMMAND exec
+chroots-setup:
+  - install cmd is chroot-setup distro target
+  - properly determine chrdst and chrname
+  - fix cache to use a global dir
+  - review work functions to fit renames
+  - move standard checks to library function
+
+chroot-list:
+  - enable a verbose mode to complain about non-existing chroots
+
+verbose mode:
+  - properly enable verbose modes for all working commands
+    - chroots-init
+    - chroots-list
+    - chroots-login
+    - chroots-setup
+    - chroots-stop
+
+chroots-delete:
+  - enable a delete mode that removes a chroot and cleans the chroot list
