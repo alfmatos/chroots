@@ -31,6 +31,8 @@ NL=`cat $CONF | grep -v "^#" | wc -l`
 
 echo "total $NL"
 
+echo "#  Name   Path   Distro   Default user"
+
 let i=0
 while read line; do
 	T=`echo $line | grep -v "^#"`
