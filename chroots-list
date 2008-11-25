@@ -37,6 +37,7 @@ LONGOPTS="verbose,help,check,clean"
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
 if [ $? != 0 ] ; then
+	echo "Invalid arguments."
 	usage $0;
 	exit 1;
 fi
