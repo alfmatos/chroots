@@ -1,0 +1,108 @@
+#!/bin/bash
+
+. chroots-functions
+
+FORCE=0
+
+function usage {
+
+NAME=`echo $1 | sed -e "s/\.\///g"`
+
+	cat << EOF
+ $NAME chroot_name [OPTIONS]"
+ Usage example: $NAME hardy"
+
+  Unmount the specified chroot.
+
+OPTIONS:
+  -h, --help      Show this message
+  -v, --verbose   Verbose
+EOF
+}
+
+OPTS="vhf"
+LONGOPTS="verbose,help,force"
+TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
+
+eval set -- "$TEMP"
+
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+while true; do
+	case "$1" in
+		--help|-h)
+			usage $0;
+			exit 0;
+			shift;
+			;;
+		--verbose|-v)
+			VERBOSE=1
+			shift;
+			;;
+		--force|-f)
+			FORCE=1;
+			shift;
+			;;
+		--)
+			shift;
+			break;
+			;;
+		*)
+			echo "Error parsing options";
+			exit 1;
+			;;
+	esac
+done;
+
+chroots_check_permissions
+
+# Determine runtime user
+CHRUSER=$USER
+CHRGROUP=$GROUPS
+
+if [ $SUDO_USER ]; then
+        CHRUSER=$SUDO_USER
+        CHRGROUP=$SUDO_GID
+fi;
+
+HOMEDIR=/home/$CHRUSER
+CFGFILE=$HOMEDIR/.chroots
+
+# Determine chroot to use
+
+if [ "$1" == "" ]; then
+	echo "No chroot specified."
+	usage $0
+	exit 1;
+fi;
+
+chroots_get_chroot $1
+
+if [ $? != 0 ]; then
+	echo "Failed to get chroot \"$1\".";
+	exit 1;
+fi;
+
+CHRNAME=$_CHRNAME
+CHRTARGET=$_CHRTARGET
+
+chroots_check_mount $CHRNAME
+
+if [ $? != 0 ]; then
+	echo "Chroot $CHRNAME is mounted. Please stop the chroot first.";
+	exit 1;
+fi;
+
+# Try to delete
+
+if [ $VERBOSE == 1 ]; then
+	echo "Deleting $CHRTARGET...";
+fi;
+
+rm -rf $CHRTARGET
+
+if [ $VERBOSE == 1 ]; then
+	echo "Removing $CHRNAME...";
+fi;
+
+grep -v $CHRNAME $CFGFILE > $CFGFILE
