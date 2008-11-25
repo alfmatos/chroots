@@ -1,6 +1,3 @@
-chroot-list:
-  - enable a verbose mode to complain about non-existing chroots
-
 verbose mode:
   - properly enable verbose modes for all working commands
     - chroots-init
@@ -8,6 +5,3 @@ verbose mode:
     - chroots-login
     - chroots-setup
     - chroots-stop
-
-chroots-delete:
-  - enable a delete mode that removes a chroot and cleans the chroot list
