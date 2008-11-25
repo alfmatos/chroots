@@ -23,7 +23,12 @@ EOF
 OPTS="vhf"
 LONGOPTS="verbose,help,force"
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+if [ $? != 0 ]; then
+	echo "Invalid arguments";
+	usage $0;
+	exit 1;
+fi;
 
 eval set -- "$TEMP"
 
