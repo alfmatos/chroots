@@ -2,15 +2,16 @@
 
 . chroots-functions
 
-CHRUSER=""
+ARGUSER=""
 
 function usage {
 
 NAME=`echo $1 | sed -e "s/\.\///g"`
 
 	cat << EOF
- $NAME [chroot_name] [OPTIONS]"
- Usage example: $NAME hardy "
+
+ $NAME chroot_name [OPTIONS]
+ Usage example: $NAME hardy-chroot
 
   Login to the specified chroot, which can be listed with "chroots list".
 
@@ -43,7 +44,7 @@ while true; do
 			shift;
 			;;
 		--username|-u)
-			CHRUSER=$2;
+			ARGUSER=$2;
 			shift; shift;
 			;;
 		--)
@@ -59,17 +60,29 @@ done;
 
 chroots_check_permissions;
 
+if [ "$1" == "" ]; then
+	echo "Chroot not specified."
+	usage $0;
+	exit 1;
+fi;
+
 # Determine chroot to use
 
-get_work_chroot $1;
+chroots_get_chroot $1;
+
+if [ $? != 0 ]; then
+	echo "Chroot \"$1\" not found."
+	exit 1
+fi;
 
 CHRNAME=$_CHRNAME;
+CHRUSER=$_CHRUSER;
+CHRTARGET=$_CHRTARGET;
 
 if [ $VERBOSE == 1 ]; then
 	echo "Using $CHRNAME as chroot name"
 fi;
 
-# Validate chroot
 chroots_check_mount $CHRNAME 
 
 if [ $? != 1 ]; then
@@ -78,15 +91,15 @@ if [ $? != 1 ]; then
 fi;
 
 # Select user to use
-if [ "$CHRUSER" == "" ]; then
-	echo "Using default user $_CHRUSER"
-	CHRUSER=$_CHRUSER
+if [ "$ARGUSER" != "" ]; then
+	echo "Using explicit user $ARGUSER"
+	CHRUSER=$ARGUSER
 fi;
 
 # Login
 
 if [ $VERBOSE == 1 ]; then
-	echo "Loging in to $CHRUSER@$CHRNAME"
+	echo "Loging in to $CHRUSER@$CHRNAME : $CHRTARGET"
 fi;
 
-chroot $_CHRTARGET /bin/su - $CHRUSER
+chroot $CHRTARGET /bin/su - $CHRUSER
