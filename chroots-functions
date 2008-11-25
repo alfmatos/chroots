@@ -81,13 +81,36 @@ function __chroots_check_mount {
 	return 0;
 }
 
-function chroots_check_mount {
+function chroots_verify_chroot {
+
+	if [ $VERBOSE == 1 ]; then
+		echo "Verifying chroot $1"
+	fi;
 
 	chroots_get_chroot $1;
 
 	if [ $? != 0 ]; then
 		echo "Mount check failed because $1 does not exist"
 		return 2;
+	fi;
+
+	chroots_check_dir $_CHRTARGET
+
+	if [ $? != 0 ]; then
+		echo "Chroot target $_CHRTARGET not found."
+		echo "Perhaps you should delete and install the chroot again."
+		return 1;
+	fi;
+
+	return 0;
+}
+
+function chroots_check_mount {
+
+	chroots_verify_chroot $1
+
+	if [ $? != 0 ]; then
+		return $?;
 	fi;
 
 	if [ $VERBOSE == 1 ]; then
@@ -136,3 +159,5 @@ function chroots_check_dir {
 		fi;
 	fi;
 }
+
+
