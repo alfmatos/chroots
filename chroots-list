@@ -1,9 +1,18 @@
 #!/bin/bash
 
+. chroots-functions
+
 CONF="$HOME/.chroots"
 
 CHECK=0
 CLEAN=0
+
+# temporaty PATH workaround
+PATH=$PATH:.
+CHROOTS_DELETE=`which chroots-delete`
+if [ -z $CHROOTS_DELETE ]; then
+	echo "Couldn't find chroots-delete in PATH"
+fi;
 
 function usage {
 NAME=`echo $1 | sed -e "s/\.\///g"`
@@ -27,9 +36,12 @@ LONGOPTS="verbose,help,check,clean"
 
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
-eval set -- "$TEMP"
+if [ $? != 0 ] ; then
+	usage $0;
+	exit 1;
+fi
 
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$TEMP"
 
 while true;  do
 	case "$1" in
@@ -76,6 +88,22 @@ while read line; do
 	fi;
 	let i=$i+1
 	echo "$i: $line"
+
+	if [ $CHECK == 1 ]; then
+		CHRNAME=`echo $line | cut -d " " -f 1`
+
+		chroots_verify_chroot $CHRNAME;
+
+		if [ $? != 0 ]; then
+			echo "Invalid chroot $CHRNAME."
+			if [[ $CLEAN == 1 || -x $CHROOTS_DELETE ]]; then
+				$CHROOTS_DELETE $CHRNAME
+			fi;
+		else
+			echo "Chroot $CHRNAME is OK"
+		fi;
+	fi;
+
 done < "$CONF"
 
 exit 0
