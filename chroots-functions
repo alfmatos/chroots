@@ -95,9 +95,7 @@ function chroots_verify_chroot {
 		return 2;
 	fi;
 
-	chroots_check_dir $_CHRTARGET
-
-	if [ $? != 0 ]; then
+	if [ ! -d $_CHRTARGET ]; then
 		echo "Chroot target $_CHRTARGET not found."
 		echo "Perhaps you should delete and install the chroot again."
 		return 1;
@@ -152,7 +150,7 @@ function chroots_check_dir {
 	DIR=$1
 	# echo "Checking $DIR"
 	if [ ! -d $DIR ]; then
-		# echo "$DIR does not exist. Creating it."
+		echo "$DIR does not exist. Creating it."
 		mkdir -p $DIR
 		if [ $? != 0 ]; then
 			echo "error creating $DIR. Aborting"
