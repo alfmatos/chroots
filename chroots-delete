@@ -23,10 +23,10 @@ EOF
 OPTS="vhf"
 LONGOPTS="verbose,help,force"
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 eval set -- "$TEMP"
 
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 while true; do
 	case "$1" in
@@ -106,3 +106,7 @@ if [ $VERBOSE == 1 ]; then
 fi;
 
 grep -v $CHRNAME $CFGFILE > $CFGFILE
+
+if [ $VERBOSE == 1 ]; then
+	echo "Done.";
+fi;
