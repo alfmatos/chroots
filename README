@@ -12,6 +12,11 @@ TBD
 Basic work flow
 ===============
 
-  chroots setup; # Create a chroot
-  chroots init; # Mount the necessary dirs for proper chroot init
-  chroots login; # Login into the chroot
+  chroots setup intrepid test-chroot; # Create a chroot
+  chroots init test-chroot; # Mount the necessary dirs for proper chroot init
+  chroots login test-chroot; # Login into the chroot
+
+  chroots stop test-chroot; # Stop the running chroot
+  chroots delete test-chroot; # Delete a chroot
+
+  chroots list; # List existing chroots
