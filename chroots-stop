@@ -9,7 +9,7 @@ function usage {
 NAME=`echo $1 | sed -e "s/\.\///g"`
 
 	cat << EOF
- $NAME [target] [OPTIONS]"
+ $NAME chroot_name [OPTIONS]"
  Usage example: $NAME hardy"
 
   Unmount the specified chroot.
@@ -20,7 +20,6 @@ OPTIONS:
   -f, --force     Force umounting the shared paths
 
 EOF
-exit 0
 }
 
 OPTS="vhf"
@@ -62,13 +61,20 @@ chroots_check_permissions
 # Determine chroot to use
 
 if [ "$1" == "" ]; then
-	get_default_chroot;
-	CHRNAME=$DEFAULT_CHRNAME
-else
-	CHRNAME=$1;
+	echo "No chroot specified."
+	usage $0
+	exit 1;
 fi;
 
-# Validate chroot
+chroots_get_chroot $1
+
+if [ $? != 0 ]; then
+	echo "Failed to get chroot \"$1\".";
+	exit 1;
+fi;
+
+CHRNAME=$_CHRNAME
+CHRTARGET=$_CHRTARGET
 
 if [ $FORCE == 0 ];  then
 	chroots_check_mount $CHRNAME
