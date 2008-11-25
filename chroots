@@ -55,7 +55,7 @@ while true; do
 done;
 
 case "$1" in 
-    "setup"|"init"|"login"|"stop"|"list")
+    "setup"|"init"|"login"|"stop"|"list"|"delete")
 	CMD=$1
 	shift;
 
