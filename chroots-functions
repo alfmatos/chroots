@@ -62,7 +62,8 @@ function chroots_get_chroot {
 	fi;
 
 	_CHRTARGET=`echo $CFG | cut -d " " -f 2`
-	_CHRUSER=`echo $CFG | cut -d " " -f 3`
+	_CHRDISTRO=`echo $CFG | cut -d " " -f 3`
+	_CHRUSER=`echo $CFG | cut -d " " -f 4`
 	_CHRNAME=$1
 
 	return 0;
