@@ -26,11 +26,17 @@ exit 0
 
 OPTS="vhu:"
 LONGOPTS="verbose,help,username:"
+
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
+
+if [ $? != 0 ] ; then
+	echo "Invalid arguments.";
+	usage $0;
+	exit 1 ;
+fi
 
 eval set -- "$TEMP"
 
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 while true; do
 	case "$1" in
