@@ -1,0 +1,13 @@
+Source: chroots
+Section: admin
+Priority: extra
+Maintainer: Alfredo Matos <alfredo.matos@digitalself.org>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.7.3
+Homepage: http://git.digitalself.org/
+
+Package: chroots
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, debootstrap
+Description: Create, manage and use chroots
+  Chroots is a utility to create, maintain, manage and use several chroot environemts on debian based systems.
