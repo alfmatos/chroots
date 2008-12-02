@@ -16,7 +16,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-. chroots-functions
+if [ -r chroots-functions ]; then
+	echo "Running in development mode."
+	CHROOTSLIB=chroots-functions
+else
+	if [ -r /usr/lib/chroots-functions ]; then
+		CHROOTSLIB=/usr/lib/chroots-functions
+	else
+		echo "chroots library not found."
+		exit 1
+	fi;
+fi;
+
+. $CHROOTSLIB
 
 FORCE=0
 

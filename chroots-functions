@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-PROGVERSION="0.01"
+PROGVERSION="0.1"
 PROGNAME="chroots"
 CHROOTS=$HOME/.chroots
 
@@ -174,5 +174,3 @@ function chroots_check_dir {
 		fi;
 	fi;
 }
-
-
