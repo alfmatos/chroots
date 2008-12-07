@@ -92,13 +92,13 @@ case "$1" in
 	shift;
 
 	if [ -x chroots-$CMD ]; then
-		./chroots-$CMD $@	
+		./chroots-$CMD $@
 	else
 		if [ -x $CHROOTSBINDIR/chroots-$CMD ]; then
 			$CHROOTSBINDIR/chroots-$CMD $@
 		else
-	            echo "Couldn't find chroots-$CMD in PATH"
-        	    exit 1
+			echo "Couldn't find chroots-$CMD in PATH"
+			exit 1
 		fi;
         fi;
         ;;
