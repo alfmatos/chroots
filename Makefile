@@ -6,9 +6,10 @@ bindir = ${prefix}/sbin
 libdir = ${prefix}/lib
 pkglibdir = $(libdir)/chroots
 distdir =$(PACKAGE)-$(VERSION)
+distdebdir = $(distdir)/debian
 
 DIST_DEB = debian/changelog debian/compat debian/control debian/copyright \
-	debian/dirs debin/rules
+	debian/dirs debian/rules
 
 SOURCES = chroots.in chroots-setup.in chroots-init.in chroots-login.in \
 	chroots-stop.in chroots-delete.in chroots-list.in
@@ -17,7 +18,7 @@ SCRIPTS = ${SOURCES:.in=}
 
 LIBS = chroots-functions
 DIST_SOURCES = $(SOURCES) $(LIBS)
-DIST_EXTRA = AUTHORS README TODO COPYING
+DIST_EXTRA = AUTHORS README TODO COPYING Makefile
 DIST_FILES = $(DIST_SOURCES) $(DIST_EXTRA) $(DIST_DEB)
 
 INSTALL = /usr/bin/install -c
@@ -68,7 +69,8 @@ uninstall: uninstall-bin uninstall-lib
 
 distdir:
 	test -d $(distdir) || mkdir $(distdir)
-	for file in $$dist_files; do \
+	test -d $(distdebdir) || mkdir $(distdebdir)
+	@list='$(DIST_FILES)'; for file in $$list; do \
 		if test -f $$file; then \
 			cp -p $$file $(distdir)/$$file || exit 1 \
 		else \
@@ -84,8 +86,6 @@ dist-bzip2: distdir
 	tar chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
 	rm -rf $(distdir)
 
-dist-all: dist-gzip dist-bzip2
-
 dist: dist-gzip
 
 clean:
@@ -95,4 +95,4 @@ clean:
 
 .PHONY: all install install-bin install-lib \
 	uninstall uninstall-bin uninstall-lib \
-	distdir dist-gzip dist clean
+	distdir dist-gzip dist-bzip2 dist clean
