@@ -17,6 +17,7 @@
 #
 
 CHROOTSLIBDIR=@pkglibdir@
+PROGNAME="@pkgname@ setup"
 
 if [ -r chroots-functions ]; then
 	echo "Running in development mode."
@@ -36,11 +37,9 @@ MIRROR="http://archive.ubuntu.com/ubuntu"
 DEBOOTSTRAP=/usr/sbin/debootstrap
 
 function usage {
-NAME=`echo $1 | sed -e "s/\.\///g"`
-
-	cat << EOF
- $NAME <suite> <target>
- Usage example: $NAME hardy /var/chroots/hardy-chroot
+cat << EOF
+ $PROGNAME <suite> <target>
+ Usage example: $PROGNAME hardy /var/chroots/hardy-chroot
 
 OPTIONS:
   -h, 	       --help    		Show this message
@@ -51,7 +50,7 @@ OPTIONS:
 
   Note #1: The deepest target directory will be used as the chroot name
 
-   $ $NAME hardy /var/chroots/hardy-chroot;
+   $ $PROGNAME hardy /var/chroots/hardy-chroot;
 
    The previous command installs an Ubuntu Hardy chroot into folder
   "/var/chroots/hardy-chroot" with name "hardy-chroot". This is the
@@ -89,7 +88,7 @@ TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
 if [ $? != 0 ] ; then
 	echo "Invalid arguments.";
-	usage $0;
+	usage;
 	exit 1 ;
 fi
 
@@ -99,7 +98,7 @@ eval set -- "$TEMP"
 while true; do
 	case "$1" in
 		--help|-h)
-			usage $0;
+			usage;
 			shift;
 			;;
 		--verbose|-v)
@@ -145,13 +144,13 @@ fi;
 
 if [ "$1" == "" ]; then
 	echo "Invalid parameters: Must specify distribution.";
-	usage $0
+	usage;
 	exit 1
 fi;
 
 if [ "$2" == "" ]; then
 	echo "Invalid parameters: Must specify target.";
-	usage $0
+	usage;
 	exit 1
 fi;
 

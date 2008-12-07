@@ -17,6 +17,7 @@
 #
 
 CHROOTSLIBDIR=@pkglibdir@
+PROGNAME="@pkgname@ stop"
 
 if [ -r chroots-functions ]; then
 	echo "Running in development mode."
@@ -35,12 +36,9 @@ fi;
 FORCE=0
 
 function usage {
-
-NAME=`echo $1 | sed -e "s/\.\///g"`
-
-	cat << EOF
- $NAME chroot_name [OPTIONS]"
- Usage example: $NAME hardy"
+cat << EOF
+ $PROGNAME chroot_name [OPTIONS]"
+ Usage example: $PROGNAME hardy"
 
   Unmount the specified chroot.
 
@@ -59,7 +57,7 @@ TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
 if [ $? != 0 ] ; then
 	echo "Invalid arguments.";
-	usage $0;
+	usage;
 	exit 1;
 fi
 
@@ -69,7 +67,7 @@ eval set -- "$TEMP"
 while true; do
 	case "$1" in
 		--help|-h)
-			usage $0;
+			usage;
 			exit 0;
 			shift;
 			;;
@@ -98,7 +96,7 @@ chroots_check_permissions
 
 if [ "$1" == "" ]; then
 	echo "No chroot specified."
-	usage $0
+	usage;
 	exit 1;
 fi;
 

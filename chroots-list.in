@@ -17,6 +17,7 @@
 #
 
 CHROOTSLIBDIR=@pkglibdir@
+PROGNAME="@pkgname@ list"
 
 if [ -r chroots-functions ]; then
 	echo "Running in development mode."
@@ -45,11 +46,9 @@ if [ -z $CHROOTS_DELETE ]; then
 fi;
 
 function usage {
-NAME=`echo $1 | sed -e "s/\.\///g"`
-
-	cat << EOF
- $NAME list
- Usage example: $NAME list
+cat << EOF
+ $PROGNAME
+ Usage example: $PROGNAME
 
 OPTIONS:
   -h, --help           Show this message
@@ -68,7 +67,7 @@ TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
 if [ $? != 0 ] ; then
 	echo "Invalid arguments."
-	usage $0;
+	usage;
 	exit 1;
 fi
 
@@ -77,7 +76,7 @@ eval set -- "$TEMP"
 while true;  do
 	case "$1" in
 		--help|-h)
-			usage $0
+			usage;
 			exit 0
 			;;
 		--check|-c)

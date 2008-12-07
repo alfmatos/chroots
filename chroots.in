@@ -17,13 +17,17 @@
 #
 
 CHROOTSBINDIR=@bindir@
+PROGNAME=@pkgname@
+PROGVERSION=@pkgversion@
+
+function version {
+echo "$PROGNAME $PROGVERSION - Copyright (C) 2008 Alfredo Matos."
+}
 
 function usage {
 
-NAME=`echo $1 | sed -e "s/\.\///g"`
-
 cat << EOF
-usage: $NAME COMMAND
+usage: $PROGNAME COMMAND
 
 The most commonly used chroots commands are:
     setup   Bootstrap a basic debian system
@@ -43,13 +47,13 @@ EOF
 VERBOSE=0
 
 OPTS="+vh"
-LONGOPTS="verbose,help"
+LONGOPTS="verbose,help,version"
 
 TEMP=`getopt -o $OPTS --long $LONGOPTS -- "$@"`
 
 if [ $? != 0 ] ; then
 	echo "Invalid arguments.";
-	usage $0;
+	usage;
 	exit 1 ;
 fi;
 
@@ -99,6 +103,6 @@ case "$1" in
         fi;
         ;;
     *)
-        usage $0
+        usage;
         ;;
 esac
