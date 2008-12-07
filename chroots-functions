@@ -16,12 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-PROGVERSION="0.1"
-PROGNAME="chroots"
-CHROOTS=$HOME/.chroots
-
-VERBOSE=1
-
 function chroots_check_permissions {
 	if [ $UID != 0 ]; then
 		echo "Superuser permissions required. Aborting."
