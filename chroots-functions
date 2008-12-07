@@ -67,9 +67,6 @@ function chroots_get_chroot {
 	CFG=`grep "^$1 " $CHROOTS` 
 
 	if [ "$CFG" == "" ]; then
-		if [ $VERBOSE == 1 ]; then
-			echo "$1 does no exist in $CHROOTS"
-		fi;
 		return 1;
 	fi;
 
@@ -96,10 +93,6 @@ function __chroots_check_mount {
 
 function chroots_verify_chroot {
 
-	if [ $VERBOSE == 1 ]; then
-		echo "Verifying chroot $1"
-	fi;
-
 	chroots_get_chroot $1;
 
 	if [ $? != 0 ]; then
@@ -124,10 +117,6 @@ function chroots_check_mount {
 		return $?;
 	fi;
 
-	if [ $VERBOSE == 1 ]; then
-		echo "Checking if $_CHRNAME is mounted..."
-	fi;
-
 	__chroots_check_mount "none" "$_CHRTARGET/proc"
 	PROCMOUNT=$?
 
@@ -136,20 +125,6 @@ function chroots_check_mount {
 
 	__chroots_check_mount "/tmp" "$_CHRTARGET/tmp"
 	TMPMOUNT=$?
-
-	if [ $VERBOSE == 1 ]; then
-		if [ $PROCMOUNT == 0 ]; then
-			echo "$_CHRTARGET/proc is not mounted"
-		fi;
-
-		if [ $DEVMOUNT == 0 ]; then
-			echo "$_CHRTARGET/dev is not mounted"
-		fi;
-
-		if [ $TMPMOUNT == 0 ]; then
-			echo "$_CHRTARGET/tmp is not mounted"
-		fi;
-	fi;
 
 	if [[ $PROCMOUNT == 1 || $DEVMOUNT == 1 || $TMPMOUNT == 1 ]]; then
 		return 1;
