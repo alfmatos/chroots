@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
+CHROOTSBINDIR=@bindir@
+
 function usage {
 
 NAME=`echo $1 | sed -e "s/\.\///g"`
@@ -80,15 +82,16 @@ case "$1" in
 	CMD=$1
 	shift;
 
-	PATH=$PATH:.
-        CHROOTS_PATH=`which chroots-$CMD`
-        if [ -z $CHROOTS_PATH ]; then
-            echo "Couldn't find chroots-$CMD in PATH"
-            exit 1
-        else
-		$CHROOTS_PATH $@
-		exit 0
-	fi
+	if [ -x chroots-$CMD ]; then
+		./chroots-$CMD $@	
+	else
+		if [ -x $CHROOTSBINDIR/chroots-$CMD ]; then
+			$CHROOTSBINDIR/chroots-$CMD $@
+		else
+	            echo "Couldn't find chroots-$CMD in PATH"
+        	    exit 1
+		fi;
+        fi;
         ;;
     *)
         usage $0
