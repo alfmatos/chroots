@@ -23,7 +23,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	#$(MAKE)
+	$(MAKE)
 	#docbook-to-man debian/chroots.sgml > chroots.1
 
 	touch $@
