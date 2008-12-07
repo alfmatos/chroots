@@ -7,7 +7,8 @@ logging in to the chroots along with the necessary management of mount points.
 Installation
 ============
 
-TBD
+  $ make
+  $ make install (as root)
 
 Basic work flow
 ===============
