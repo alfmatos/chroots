@@ -96,7 +96,6 @@ function chroots_verify_chroot {
 	chroots_get_chroot $1;
 
 	if [ $? != 0 ]; then
-		echo "Mount check failed because $1 does not exist"
 		return 2;
 	fi;
 

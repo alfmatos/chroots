@@ -96,6 +96,7 @@ CHRNAME=$_CHRNAME
 chroots_verify_chroot $CHRNAME;
 
 if [ $? != 0 ]; then
+	echo "$CHRNAME already mounted or does not exist."
 	exit 1;
 fi;
 
