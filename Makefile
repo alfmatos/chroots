@@ -1,6 +1,6 @@
 prefix=/usr
 PACKAGE=chroots
-VERSION=0.1
+VERSION=0.2
 
 bindir = ${prefix}/sbin
 libdir = ${prefix}/lib

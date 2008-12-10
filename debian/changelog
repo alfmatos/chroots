@@ -1,3 +1,9 @@
+chroots (0.2-1) unstable; urgency=low
+
+  * Upstream release (First public release)
+
+ -- Alfredo Matos <alfredo.matos@digitalself.org>  Wed, 10 Dec 2008 01:04:54 +0000
+
 chroots (0.1-1) unstable; urgency=low
 
   * Initial package
