@@ -19,6 +19,8 @@
 CHROOTSLIBDIR=@pkglibdir@
 PROGNAME="@pkgname@ login"
 
+VERBOSE=0
+
 if [ -r chroots-functions ]; then
 	echo "Running in development mode."
 	CHROOTSLIB=chroots-functions
