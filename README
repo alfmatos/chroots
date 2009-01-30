@@ -1,8 +1,8 @@
-chroots - Simple chroot creating and maintenance
-================================================
+chroots - Simplified chroot management
+======================================
 
-Chroots allow the creation of chroots by issue a setup command. It also allows
-logging in to the chroots along with the necessary management of mount points. 
+Chroots is a command line tool that allows managing multiple chroot
+environments. It supports the normal workflow of mounting and using a chroot. It also enables creating and deleting multiple chroots.
 
 Installation
 ============
@@ -10,8 +10,8 @@ Installation
   $ make
   $ make install (as root)
 
-Basic work flow
-===============
+Tutorial
+========
 
   chroots setup intrepid test-chroot; # Create a chroot
   chroots init test-chroot; # Mount the necessary dirs for proper chroot init
